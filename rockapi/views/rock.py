@@ -11,7 +11,15 @@ class RockView(ViewSet):
     """Rock view set"""
 
     def create(self, request):
-        return Response("", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        chosen_type = Type.objects.get(pk=request.data["typeId"])
+        rock = Rock()
+        rock.user = request.auth.user
+        rock.weight = request.data["weight"]
+        rock.name = request.data["name"]
+        rock.type = chosen_type
+        rock.save()
+        serialized = RockSerializer(rock, many=False)
+        return Response(serialized.data, status=status.HTTP_201_CREATED)
 
     def list(self, request):
         try:
